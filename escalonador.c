@@ -13,10 +13,10 @@
 
 Fila *fila1, *fila2, *fila3,*filaIO;
 
-void  procHandler(int signal);
+void procHandler(int signal);
 void fimHandler(int signal);
 void exibeProcHandler(int signal);
-void RoundRobin(Fila *f,int t);
+void RoundRobin(Fila *f);
 void IOHandler(int signal);
 void CHLDHandler(int signal);
 resultEx execProc(Proc *p, int t);
@@ -24,15 +24,16 @@ int indice_Rajada (Proc *p);
 
 int main (int argc, char** argv){
    	
-	fila1=fila_cria();
- 	fila2=fila_cria();
- 	fila3=fila_cria();
+	fila1=fila_cria(1);
+ 	fila2=fila_cria(2);
+ 	fila3=fila_cria(4);
+ 	filaIO=fila_cria(3);
 
     signal(SIGUSR1,procHandler);
 	signal(SIGQUIT,fimHandler);
 	signal(SIGCHLD,CHLDHandler);
 	signal(SIGUSR2,IOHandler);
-	//signal(SIGUSR2,exibeProcHandler);
+
 	
 	
 	
@@ -67,7 +68,7 @@ void RoundRobin(Fila *f){
 	int t,cond;
 	p=(Proc*)malloc(sizeof(Proc));
 	
-	t=f->t;
+	t=fila_tempo(f);
 	
 	//Descobrir se filas de prioridade maior estao vazias
 
@@ -106,9 +107,9 @@ void RoundRobin(Fila *f){
 				}
 				
 				fila_push(filaIO,p);	
-				kill(SIGUSR2,IOHandler);
+				kill(p->pid,SIGUSR2);
 			}			
-			
+		}
 	}
 	return;	
 }
@@ -157,7 +158,9 @@ int indice_Rajada (Proc *p){
 	return -1; 
 }
 
+void IOHandler(int signal){
 
+}
 
 
 void CHLDHandler(int signal){
@@ -171,7 +174,7 @@ void CHLDHandler(int signal){
 	}	
 }
 
-
+/*
 void exibeProcHandler(int signal){
 	Proc *p;
 	int i;
@@ -187,7 +190,32 @@ void exibeProcHandler(int signal){
     for(i=0;i<p->numR;i++){
         printf("v[%d]=%d\n", i,p->raj[i]);
     }
+}*/
+
+void  procHandler(int signal){
+	Proc *p,*pNovo;
+	int seg1,i,pid;
+	seg1 = shmget(key,sizeof(Proc),IPC_EXCL| S_IRUSR | S_IWUSR);
+	p=(Proc*)shmat(seg1,0,0);
+	
+	pNovo=(Proc*)malloc(sizeof(Proc));
+	
+	pNovo->fila=p->fila;
+	pNovo->estado=p->estado;
+	pNovo->pid=p->pid;
+	strcpy(pNovo->nome,p->nome);
+	pNovo->numR=p->numR;
+	
+	 for(i=0;i<p->numR;i++){
+        pNovo->raj[i]=p->raj[i];
+    }
+	
+	printf("Peguei processo da memoria\n");
+	fila_push(fila1,p);
+	return;
+	
 }
+
 
 
 void fimHandler(int signal){
