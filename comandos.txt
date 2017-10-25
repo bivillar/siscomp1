@@ -1,0 +1,8 @@
+gcc -o escalonador escalonador.c
+gcc -o -t1 interpretador.c
+
+exec <nome> (1,2,3,4)
+
+gbd t1
+run
+quit
