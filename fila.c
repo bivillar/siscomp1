@@ -6,7 +6,7 @@
 //  Copyright © 2016 Livia Aloise. All rights reserved.
 //
 
-#include "Fila.h"
+#include "fila.h"
 #include <stdlib.h>
 #define N 50
 
@@ -15,11 +15,11 @@ struct fila{
     int n;
     int ini;
     int fim;
-    Proc vet[N];
+    Proc *vet[N];
 };
 
 
-Fila* cria(void)
+Fila* fila_cria(void)
 {
     Fila *f;
     f=(Fila*)malloc(sizeof(Fila));
@@ -29,7 +29,7 @@ Fila* cria(void)
     return f;
 }
 
-void insere (Fila* f, Proc *p)
+void fila_push (Fila* f, Proc *p)
 {
     if(f->n==N)
     {
@@ -40,7 +40,7 @@ void insere (Fila* f, Proc *p)
     f->vet[f->fim]=p;
     f->n++;
 }
-int retira (Fila* f)
+Proc* fila_pop (Fila* f)
 {
     Proc *p;
     if(f->n==0)
@@ -51,15 +51,15 @@ int retira (Fila* f)
     p=f->vet[f->ini];
     f->ini=(f->ini+1)%N;
     f->n--;
-    return n;
+    return p;
 }
 
-int vazia (Fila* f)
+int fila_vazia (Fila* f)
 {
     return (f->n==0);
 }
 
-void libera (Fila* f)
+void fila_libera (Fila* f)
 {
     free(f);
 }
