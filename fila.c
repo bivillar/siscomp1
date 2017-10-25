@@ -9,16 +9,18 @@ struct no{
 struct fila{
 	No *ini;
 	No *fim;
+	int t;
 };
 
 
-Fila* fila_cria(void)
+Fila* fila_cria(int t)
 {
     Fila *f;
     f=(Fila*)malloc(sizeof(Fila));
     if(f==NULL){printf("Memoria Insuficiente\n");exit(1);}
     f->ini=NULL;
     f->fim=NULL;
+    f->t=t;
     return f;
 }
 
