@@ -1,21 +1,14 @@
-//
-//  Fila.c
-//  prog2_P3
-//
-//  Created by Livia Aloise on 13/06/16.
-//  Copyright © 2016 Livia Aloise. All rights reserved.
-//
-
 #include "fila.h"
 #include <stdlib.h>
-#define N 50
 
+struct no{
+	Proc *pr;
+	No *prox;
+};
 
 struct fila{
-    int n;
-    int ini;
-    int fim;
-    Proc *vet[N];
+	No *ini;
+	No *fim;
 };
 
 
@@ -23,51 +16,55 @@ Fila* fila_cria(void)
 {
     Fila *f;
     f=(Fila*)malloc(sizeof(Fila));
-    f->n=0;
-    f->ini=0;
-    f->fim=0;
+    if(f==NULL){printf("Memoria Insuficiente\n");exit(1);}
+    f->ini=NULL;
+    f->fim=NULL;
     return f;
 }
 
 void fila_push (Fila* f, Proc *p)
 {
-    if(f->n==N)
-    {
-        printf("Fila cheia");
-        exit(1);
-    }
-    f->fim++;
-    f->vet[f->fim]=p;
-    f->n++;
+	No *n;
+	n = (No*) malloc (sizeof(No));
+	n->pr = p;
+	n->prox = NULL;
+	if(!f->fim)
+		f->ini = f->fim = n;
+	else{
+		f->fim->prox = n;
+		f->fim = n;
+	}
 }
+
 Proc* fila_pop (Fila* f)
 {
+	No *aux;
     Proc *p;
-    if(f->n==0)
+    if(fila_vazia(f))
     {
         printf("Fila Vazia");
         exit(1);
     }
-    p=f->vet[f->ini];
-    f->ini=(f->ini+1)%N;
-    f->n--;
+    p = f->ini->pr;
+	aux = f->ini;
+	f->ini=aux->prox;
+	free(aux);
     return p;
 }
 
 int fila_vazia (Fila* f)
 {
-    return (f->n==0);
+    return (f->ini==NULL);
 }
 
 void fila_libera (Fila* f)
 {
+    No *n, *aux;
+    n = f->ini;
+    while(n){
+    	aux = n;
+    	n= aux->prox;
+    	free(aux);
+    }
     free(f);
 }
-
-
-
-
-
-
-
-

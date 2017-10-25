@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "def.h"
 
+typedef struct no No;
 typedef struct fila Fila;
 
 Fila* fila_cria(void);
