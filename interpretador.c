@@ -9,7 +9,8 @@
 #include <sys/shm.h>
 #include "def.h"
 #define MAXS 100
-#define key 9999
+#define key 9992
+
 
 void fimHandler(int signal){
 	int seg1;
@@ -33,7 +34,6 @@ int main (void){
 	seg1 = shmget(key,sizeof(Proc),IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
 	p=(Proc*)shmat(seg1,0,0);
 	
-	
 	printf("Interpretador, digite os programas - 0 para terminar:\n");
 
 	if((pid=fork())<0)
@@ -45,7 +45,7 @@ int main (void){
 	if(pid>0){
 
 		/*LEITURA DOS COMANDOS*/
-		while(1){
+		while(1){		
 			scanf(" %[^\n]", cmd);
 			if(strcmp(cmd,"0")==0){
 				printf("Terminado\n");
@@ -86,23 +86,29 @@ int main (void){
 			
 			printf(" Mandando o Sinal\n");
 			
-			com=kill(pid,SIGUSR1);
+			//com=kill(pid,SIGUSR1);
+			//kill(pid,SIGUSR2);
+			/*
 			if (com==-1){
-				printf("Erro no sinal");
+				printf("Erro no sinal\n");
 				exit(-1);
 			}
-			
-			if(shmdt(p)==-1){
-				printf("Erro no detach");
-				exit(1);
-			}
+			printf("sinal :%d\n",com);
+			*/
 
         }
+        
+        if(shmdt(p)==-1){
+				printf("Erro no detach\n");
+				exit(1);
+		}
+	
 		
 	}
 	
 	if(pid==0){
-		sleep(5);
+		sleep(4);
+		printf("OIIIOOI\n");
 		execv("./escalonador", arg);
 	}
 	

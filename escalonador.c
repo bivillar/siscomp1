@@ -7,39 +7,9 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <sys/shm.h>
-#include "def.h"
-#define key 9999
-#define N 50
+#include "fila.h"
+#define key 9992
 
-typedef struct fila{
-    int n;
-    int ini;
-    int fim;
-    Proc *vProc;
-} Fila;
-
-
-Fila* fila_cria(void)
-{
-    Fila *f;
-    f=(Fila*)malloc(sizeof(Fila));
-    f->n=0;
-    f->ini=0;
-    f->fim=0;
-    return f;
-}
-
-void fila_push (Fila* f, Proc *p)
-{
-    if(f->n==N)
-    {
-        printf("Fila cheia");
-        exit(1);
-    }
-    f->fim++;
-    f->vProc[f->fim]=*p;
-    f->n++;
-}
 
 Fila *fila1, *fila2, *fila3;
 
@@ -53,6 +23,10 @@ void  procHandler(int signal){
 	fila_push(fila1,p);
 }
 
+void  testeHandler(int signal){
+	printf("Sinal recebido\n");
+}
+
 
 
 
@@ -61,21 +35,29 @@ int main (int argc, char** argv){
     int numP,i;
     int seg1;
 	seg1 = shmget(key,sizeof(Proc), S_IRUSR | S_IWUSR);
-
+	
+	//signal(SIGUSR1,procHandler);
+	//signal(SIGUSR2,testeHandler);
+	
     Proc *pNovo;
+    
+    //pNovo=(Proc*)shmat(seg1,0,0);
+    //printf("numR: %d\n",pNovo->numR);
+    
     
 	fila1=fila_cria();
  	fila2=fila_cria();
  	fila3=fila_cria();
  	
-    signal(SIGUSR1,procHandler);
-   
-   
     
+   
+   	printf("oi\n");
+    /*
     if(shmdt(pNovo)==-1){
-				printf("Erro no detach");
+				printf("Erro no detach\n");
 				exit(1);
-	}
+	}*/
+	
 	
 	if(shmctl(seg1,IPC_RMID,NULL)==-1){
         printf("Nao foi possivel destruir a memoria\n");
