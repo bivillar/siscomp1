@@ -8,7 +8,7 @@
 #include <signal.h>
 #include <sys/shm.h>
 #include "fila.h"
-#define key 9992
+#define key 9989
 
 
 Fila *fila1, *fila2, *fila3;
@@ -21,6 +21,7 @@ void  procHandler(int signal){
 	
 	printf("ola\n");
 	fila_push(fila1,p);
+	return;
 }
 
 void  testeHandler(int signal){
@@ -32,31 +33,31 @@ void  testeHandler(int signal){
 
 int main (int argc, char** argv){
     
-    int numP,i;
+    int numP,i,pid;
     int seg1;
 	seg1 = shmget(key,sizeof(Proc), S_IRUSR | S_IWUSR);
+	Proc *pNovo; 
 	
-	//signal(SIGUSR1,procHandler);
-	//signal(SIGUSR2,testeHandler);
-	
-    Proc *pNovo;
-    
-    //pNovo=(Proc*)shmat(seg1,0,0);
-    //printf("numR: %d\n",pNovo->numR);
-    
     
 	fila1=fila_cria();
  	fila2=fila_cria();
  	fila3=fila_cria();
  	
-    
+    //signal(SIGUSR1,procHandler);
+	signal(SIGUSR2,testeHandler);
+	
+	pid = getpid();
+	printf("pid= %d\n",pid);
+	
+    //printf("numR: %d\n",pNovo->numR);
    
    	printf("oi\n");
-    /*
+   	printf("pid %d\n",getpid());
+    
     if(shmdt(pNovo)==-1){
 				printf("Erro no detach\n");
 				exit(1);
-	}*/
+	}
 	
 	
 	if(shmctl(seg1,IPC_RMID,NULL)==-1){
