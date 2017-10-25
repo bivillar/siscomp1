@@ -9,7 +9,6 @@
 #include <sys/shm.h>
 #include "fila.h"
 #define EVER ;;
-#define MAX 23
 
 
 Fila *fila1, *fila2, *fila3,*filaIO;
@@ -17,11 +16,12 @@ Fila *fila1, *fila2, *fila3,*filaIO;
 void  procHandler(int signal);
 void fimHandler(int signal);
 void exibeProcHandler(int signal);
-void RoundRobin(Fila *f,int t)
+void RoundRobin(Fila *f,int t);
+void IOHandler(int signal);
 int execProc(Proc *p, int t);
 
 int main (int argc, char** argv){
-   	
+   	int pid;
 	fila1=fila_cria();
  	fila2=fila_cria();
  	fila3=fila_cria();
@@ -29,9 +29,15 @@ int main (int argc, char** argv){
     signal(SIGUSR1,procHandler);
 	signal(SIGQUIT,fimHandler);
 	//signal(SIGUSR2,exibeProcHandler);
-
 	
-	for(EVER);
+	if(pid!=0){//processo pai
+		for(EVER){
+			RoundRobin(fila1);
+			RoundRobin(fila2);
+			RoundRobin(fila3);
+		}
+	}
+	if(pid==0)//processo filho que vai gerenciar a fila de io ao mesmo tempo
 
 	return 0;	
 }
@@ -59,25 +65,82 @@ void  procHandler(int signal){
 	
 }
 
+int verificaRR(int t){
+	int i;
+	
+	if(t==2){
+		if(!fila_vazia(fila1))
+		return -1;
+	}
+	if(t==4){
+		if(!fila_vazia(fila2))
+			return -1;
+	}
+	return 0;
+}
+
+
+
 void RoundRobin(Fila *f){
 	Proc *p;
 	int t,cond;
 	p=(Proc*)malloc(sizeof(Proc));
 	
-	t=f->t;
+	t=fila_tempo(f);
 	
-	if(
+	//Descobrir se filas de prioridade maior estao vazias
+
+	if(verificaRR(t)){
 	
-	
-	while(!fila_vazia(f)){
-		filaProc=p->fila;
-		
-		if (filaProc==1){
-			cond=execProc();
-		}
-	
-	}	
+		while(!fila_vazia(f)){
+			
+			p=fila_pop(f);
+			cond=execProc(p,t);
+			
+			if(cond==0)//TERMINOU
+			{
+				printf("Processo terminou \n");
+				free(p);
+			}
+			
+			else if(cond==1)//Nao terminou e acabou o quantum
+			{
+				if(t==1){
+					p->fila=2;
+					fila_push(fila2,p);
+				}
+				else{
+					p->fila=3;
+					fila_push(fila3,p);
+				}
+			}
+			
+			else{//SOBROU TEMPO
+				kill()
+				if(t==1 || t==2)
+				{
+					p->fila=1;		
+					fila_push(fila1,p);
+				}
+				else{
+					p->fila=2;
+					fila_push(fila2,p);
+				}	
+				
+			}			
+			
+	}
+	return;	
 }
+
+void IOHandler(int signal){
+	
+}
+
+void CHLDHandler(int signal){
+	
+}
+
 
 void exibeProcHandler(int signal){
 	Proc *p;
