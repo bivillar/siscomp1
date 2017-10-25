@@ -1,8 +1,10 @@
-gcc -o escalonador escalonador.c
+gcc -o escalonador escalonador.c fila.c
 gcc -o -t1 interpretador.c
 
-exec <nome> (1,2,3,4)
+exec <nome> (1,2,3)
 
-gbd t1
+gdb t1
 run
 quit
+
+exec <ex> (2,3)
