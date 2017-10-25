@@ -3,10 +3,16 @@
 
 typedef enum{
 	novo		=0,
-	pronto 		=1,
-	atual		=2,
-	fila		=3
+	io          =1,
+	terminado   =2,
+	fila        =3
 } Est;
+
+typedef enum{
+	faltouTempo =1,
+	sobrouTempo =2,
+	terminou    =4,
+} resultEx;
 
 typedef struct processo{
 	int pid;
