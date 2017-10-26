@@ -10,7 +10,6 @@
 #include "fila.h"
 #define EVER ;;
 
-
 Fila *fila1, *fila2, *fila3,*filaIO;
 
 void procHandler(int signal);
@@ -29,15 +28,17 @@ int main (int argc, char** argv){
  	fila3=fila_cria(4);
  	filaIO=fila_cria(3);
 
-    signal(SIGUSR1,procHandler);
+    	signal(SIGUSR1,procHandler);
 	signal(SIGQUIT,fimHandler);
 	signal(SIGCHLD,CHLDHandler);
 	signal(SIGUSR2,IOHandler);
 
-	
-	
-	
 	for(EVER){
+		if (fila_vazia(fila1) && fila_vazia(fila2) && fila_vazia(fila1) ){
+		printf("Escalonador pausado\n");
+		pause();
+		}
+		
 		RoundRobin(fila1);
 		RoundRobin(fila2);
 		RoundRobin(fila3);
@@ -46,8 +47,9 @@ int main (int argc, char** argv){
 	return 0;	
 }
 
-
 int verificaRR(int t){
+
+	printf("entrou no verifica rr\n");
 	int i;
 	
 	if(t==2){
@@ -61,8 +63,6 @@ int verificaRR(int t){
 	return 0;
 }
 
-
-
 void RoundRobin(Fila *f){
 	Proc *p;
 	int t,cond;
@@ -72,13 +72,11 @@ void RoundRobin(Fila *f){
 	
 	//Descobrir se filas de prioridade maior estao vazias
 
-	if(verificaRR(t)){
-	
+	if(verificaRR(t)==0){
+
 		while(!fila_vazia(f)){
-			
 			p=fila_pop(f);
 			cond=execProc(p,t);
-			
 			if(cond==0)//TERMINOU
 			{
 				printf("Processo terminou \n");
@@ -115,6 +113,9 @@ void RoundRobin(Fila *f){
 }
 
 resultEx execProc(Proc *p, int t){
+
+	printf("entrou no execproc \n");
+	
 	char cmdC[MAX]="./" ;
 	int indR;
 	if (p->estado==novo){ //processo novo -> criar processo filho
@@ -148,7 +149,8 @@ resultEx execProc(Proc *p, int t){
 		p->estado=fila;
 		return faltouTempo;
 	}
-}
+}	
+
 
 int indice_Rajada (Proc *p){
 	int i;
@@ -159,11 +161,25 @@ int indice_Rajada (Proc *p){
 }
 
 void IOHandler(int signal){
-
+	
+	printf("entrou no io \n");	
+	
+	int id=fork();
+	if (id==0){
+		Proc *p=fila_pop(filaIO);
+		sleep(3);
+		if (p->fila==1)
+			fila_push(fila1,p);
+		else
+			fila_push(fila2,p);
+		exit(1);
+	}
 }
 
-
 void CHLDHandler(int signal){
+
+	printf("entrou no execproc \n");
+	
 	int pidE= waitpid(-1, NULL, WNOHANG);
 	if (pidE==0)//Processo parou por um sinal
 	{
@@ -197,6 +213,10 @@ void  procHandler(int signal){
 	int seg1,i,pid;
 	seg1 = shmget(key,sizeof(Proc),IPC_EXCL| S_IRUSR | S_IWUSR);
 	p=(Proc*)shmat(seg1,0,0);
+	if (!p){
+		printf("Erro shm");
+		exit(-1);
+	}
 	
 	pNovo=(Proc*)malloc(sizeof(Proc));
 	
@@ -208,6 +228,7 @@ void  procHandler(int signal){
 	
 	 for(i=0;i<p->numR;i++){
         pNovo->raj[i]=p->raj[i];
+  
     }
 	
 	printf("Peguei processo da memoria\n");
@@ -216,19 +237,16 @@ void  procHandler(int signal){
 	
 }
 
-
-
 void fimHandler(int signal){
+	printf("entrou no fim \n");
 	int seg1;
 	seg1 = shmget(key,sizeof(Proc), S_IRUSR | S_IWUSR);
+	
 	
 	if(shmctl(seg1,IPC_RMID,0)==-1){
         printf("Nao foi possivel destruir a memoria\n");
         exit(1);
-    }
+   	}
     printf("Terminando o escalonador\n");
     exit(0);
 }
-
-
-
