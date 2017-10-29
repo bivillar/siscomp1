@@ -10,6 +10,7 @@
 #include "fila.h"
 #define EVER ;;
 
+
 Fila *fila1, *fila2, *fila3,*filaIO;
 pid_t pid_terminado=0;
 
@@ -36,11 +37,15 @@ int main (int argc, char** argv){
     
     for(EVER){
         if (fila_vazia(fila1) && fila_vazia(fila2) && fila_vazia(fila3) ){
-            printf("-->Escalonador pausado\n");
+            printf("(Escalonador pausado)\n");
             pause();
         }
-        printf("\n\n-->Escalonador voltou\n");
+        
+    #ifdef DEBUG
+        printf("\n-->Escalonador voltou\n");
         printf("--->filas vazias 1:%d 2:%d 3:%d\n", fila_vazia(fila1),fila_vazia(fila2),fila_vazia(fila3));
+    #endif    
+        
         RoundRobin(fila1,1);
         RoundRobin(fila2,2);
         RoundRobin(fila3,4);
@@ -50,7 +55,6 @@ int main (int argc, char** argv){
 }
 
 int PrimeiraFilaVazia(int t){
-    //printf("entrou no verifica rr\n");
     if( (t==2 && ( !fila_vazia(fila1) || fila_vazia(fila2) )) || 
     	(t==4 && ((!fila_vazia(fila2) || !fila_vazia(fila1)) || fila_vazia(fila3))))
             return 0;
@@ -59,22 +63,41 @@ int PrimeiraFilaVazia(int t){
 
 void RoundRobin(Fila *f, int t){
     Proc *p;
-    int cond;
+    int cond,fila;
     p=(Proc*)malloc(sizeof(Proc));
-   
+    
+#ifdef DEBUG    
     printf("----->Entrou RR(%d)\n",t);
+#endif    
+
     //Descobrir se filas de prioridade maior estao vazias
     
     if(PrimeiraFilaVazia(t)){
+    
+    #ifdef DEBUG
         printf("--->Entrou Verifica RR(%d) == 0\n",t);
         printf("--->Fila Vazia = %d\n",fila_vazia(f));
+    #endif    
+    	
+    	if(t==4)
+    		fila=3;
+    	else
+    		fila=t;
+    	printf("FILA %d\n",fila);
+    
         while(!fila_vazia(f)){
             p=fila_pop(f);
             cond=execProc(p,t);
+            
+        #ifdef DEBUG
             printf("--->cond=%d \n",cond);
+        #endif
+        
             if(cond==terminou)//TERMINOU
             {
-                printf("Processo terminou \n");
+            #ifdef DEBUG
+                printf("--->Processo terminou \n");
+            #endif
                 free(p);
             }
             
@@ -100,7 +123,11 @@ void RoundRobin(Fila *f, int t){
                 }
                 
                 fila_push(filaIO,p);
+                
+            #ifdef DEBUG
                 printf("--->FILA IO TA VAZIA? %d\n", fila_vazia(filaIO));
+            #endif
+            
                 kill(getpid(),SIGUSR2);
             }
         }
@@ -122,21 +149,32 @@ resultEx execProc(Proc *p, int t){
     */
     
     indR = indice_Rajada(p);
+    
+#ifdef DEBUG
     printf("--->INDR =%d\n", indR);
+#endif
     
     if (p->estado==novo){ //processo novo -> criar processo filho
+    
+  	#ifdef DEBUG
         printf("--->Entrou criar outro processo\n");
+    #endif
+    
         if((p->pid=fork())==0){ //processo filho
-            printf("--->Entrei no filho \n");
+            //printf("--->Entrei no filho \n");
             strcat(aux,p->nome);
             execv(aux,arg);
         }
     }
     
+#ifdef DEBUG   
     printf("--->Entrou execProc\n");
+#endif    
+    
     if(t >= p->raj[indR]){ //se eu tenho >= tempo pra executar do que a rajada que o processo ta
+    #ifdef DEBUG
         printf("--->Vai executar pid %d\n",p->pid);
-        
+    #endif    
         //sigprocmask (SIG_BLOCK, &maskset, &oldmaskset);
         kill(p->pid,SIGCONT);
         sleep(p->raj[indR]); //executa durante esse tempo
@@ -151,7 +189,9 @@ resultEx execProc(Proc *p, int t){
         }
         else{ // tem mais rajada-> entra em espera de io
             p->estado=io;
+        #ifdef DEBUG
             printf("--->tem que ir pra IO\n");
+        #endif
             return sobrouTempo;
         }
     }
@@ -162,7 +202,11 @@ resultEx execProc(Proc *p, int t){
     kill(p->pid,SIGSTOP);
     //sigprocmask (SIG_UNBLOCK, &maskset, &oldmaskset);
     p->raj[indR]-=t;
+    
+#ifdef DEBUG
     printf("--->TEMPO NA RAJADA: %d\n", p->raj[indR]);
+#endif
+
     p->estado=fila;
     return faltouTempo;
     //}
@@ -182,14 +226,21 @@ void IOHandler(int signal){
     if (id==0){
     	
         Proc *p=fila_pop(filaIO);
+        
+    #ifdef DEBUG
         printf("--->Entrou no io processo:%d\n", getpid());
+    #endif
+    
         sleep(3);
         if (p->fila==1)
             fila_push(fila1,p);
         else
             fila_push(fila2,p);
+            
+    #ifdef DEBUG
         printf("--->Terminou IO\n");
         printf("--->IO: filas vazias 1:%d 2:%d 3:%d\n", fila_vazia(fila1),fila_vazia(fila2),fila_vazia(fila3));
+    #endif
        
     }
 }
@@ -232,7 +283,9 @@ void  procHandler(int signal){
         pNovo->raj[i]=p->raj[i];
 	}
 
+#ifdef DEBUG
     printf("--->Peguei processo %s da memoria\n\n", pNovo->nome);
+#endif
     
     fila_push(fila1,pNovo);
     if (!fila_vazia(fila1))
@@ -246,13 +299,17 @@ void criaProc (Proc *p, char *pC){
     char *const arg[]= {pC, NULL}, pB[MAX]="./";
     
     strcat(pB,p->nome);
-    printf("--->execv(%s, {%s,NULL})\n", pB,arg[0]);
+#ifdef DEBUG
+    printf("--------->execv(%s, {%s,NULL})\n", pB,arg[0]);
+#endif
     p->pid=fork();
     
     if(p->pid<0){printf("erro no fork");exit(-1);}
     
     if(p->pid==0){ //processo filho
+    #ifdef DEBUG
         printf("--->entrei no filho \n");
+    #endif
         execv(pB,arg);
     }
     if(p->pid!=1)
