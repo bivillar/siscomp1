@@ -1,18 +1,16 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-
+#include <signal.h>
 int main(){
-	int status;
-    char *const arg[]={"escalonador.c",NULL};
-	printf("exercicio 4 \n");
-	
-	if(fork()!=0){/* Comandos Pai */
-		waitpid( -1, &status, 0);
-	}
-	else{ /*Comandos Filho*/
-		execv("./e", arg);	
-	}
+    int i;
+   	for(i=0;i<1;i++){
+   		printf("pid do ex: %d\n",getpid());
+   		sleep(1);
+   	}
+   	for(i=0;i<1;i++){
+   		printf("pid do ex: %d\n",getpid());
+   		sleep(1);
+   	}
+    kill(getpid(),SIGCHLD);
 	return 0;
 } 
