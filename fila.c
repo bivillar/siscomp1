@@ -8,34 +8,30 @@ struct no{
 
 struct fila{
 	No *ini;
-	No *fim;
-	int t;
 };
 
 
-Fila* fila_cria(int t)
+Fila* fila_cria(void)
 {
     Fila *f;
     f=(Fila*)malloc(sizeof(Fila));
     if(f==NULL){printf("Memoria Insuficiente\n");exit(1);}
     f->ini=NULL;
-    f->fim=NULL;
-    f->t=t;
     return f;
 }
 
 void fila_push (Fila* f, Proc *p)
 {
-	No *n;
-	n = (No*) malloc (sizeof(No));
-	n->pr = p;
-	n->prox = NULL;
-	if(!f->fim)
-		f->ini = f->fim = n;
-	else{
-		f->fim->prox = n;
-		f->fim = n;
-	}
+	No *n, *aux;
+    n=(No*)malloc(sizeof(No));
+    if (!f->ini)
+        f->ini = n;
+    else{
+        for(aux = f->ini; aux->prox; aux=aux->prox);
+        aux->prox = n;
+    }
+    n->pr = p;
+    n->prox = NULL;
 }
 
 Proc* fila_pop (Fila* f)
@@ -47,8 +43,8 @@ Proc* fila_pop (Fila* f)
         printf("Fila Vazia");
         exit(1);
     }
-    p = f->ini->pr;
-	aux = f->ini;
+    aux = f->ini;
+    p = aux->pr;
 	f->ini=aux->prox;
 	free(aux);
     return p;
@@ -69,8 +65,4 @@ void fila_libera (Fila* f)
     	free(aux);
     }
     free(f);
-}
-
-int fila_tempo(Fila *f){
-	return f->t;
 }
