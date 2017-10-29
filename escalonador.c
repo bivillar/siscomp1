@@ -11,6 +11,7 @@
 #define EVER ;;
 
 Fila *fila1, *fila2, *fila3,*filaIO;
+pid_t pid_terminado=0;
 
 void procHandler(int signal);
 void fimHandler(int signal);
@@ -38,7 +39,7 @@ int main (int argc, char** argv){
             printf("-->Escalonador pausado\n");
             pause();
         }
-        printf("\n-->Escalonador voltou\n");
+        printf("\n\n-->Escalonador voltou\n");
         printf("--->filas vazias 1:%d 2:%d 3:%d\n", fila_vazia(fila1),fila_vazia(fila2),fila_vazia(fila3));
         RoundRobin(fila1,1);
         RoundRobin(fila2,2);
@@ -121,7 +122,7 @@ resultEx execProc(Proc *p, int t){
     */
     
     indR = indice_Rajada(p);
-    printf("--->INDR =%d", indR);
+    printf("--->INDR =%d\n", indR);
     
     if (p->estado==novo){ //processo novo -> criar processo filho
         printf("--->Entrou criar outro processo\n");
@@ -134,7 +135,7 @@ resultEx execProc(Proc *p, int t){
     
     printf("--->Entrou execProc\n");
     if(t >= p->raj[indR]){ //se eu tenho >= tempo pra executar do que a rajada que o processo ta
-        printf("Vai executar pid %d\n",p->pid);
+        printf("--->Vai executar pid %d\n",p->pid);
         
         //sigprocmask (SIG_BLOCK, &maskset, &oldmaskset);
         kill(p->pid,SIGCONT);
@@ -144,6 +145,7 @@ resultEx execProc(Proc *p, int t){
         
         p->raj[indR]=0; //zera o tempo da rajada
         if(indice_Rajada(p)==-1){//se nao tem mais rajada diferente de 0
+        	kill(p->pid,SIGCONT);
             p->estado=terminado;
             return terminou;
         }
@@ -188,21 +190,19 @@ void IOHandler(int signal){
             fila_push(fila2,p);
         printf("--->Terminou IO\n");
         printf("--->IO: filas vazias 1:%d 2:%d 3:%d\n", fila_vazia(fila1),fila_vazia(fila2),fila_vazia(fila3));
-        exit(1); //EMITE SIHCHILD OQ FAZER?
+       
     }
 }
 
 void CHLDHandler(int signal){
-    
-    int pidE= waitpid(-1, NULL, 0);
-    
-    if (pidE==0)//Processo parou por um sinal
-    {
-        return;//Nao faz nada;
-    }
-    else{
-        printf("Processo %d terminou\n",pidE);
-    }	
+    int pidE = waitpid(-1, NULL, 0);
+	if (pidE==0)//Processo parou por um sinal
+	{
+	    return;//Nao faz nada;
+	}
+	else{
+	    printf("Processo %d terminou\n",pidE);
+	}
 }
 
 void  procHandler(int signal){
