@@ -1,0 +1,96 @@
+PUC-Rio	- Trabalho 1 de Sistemas de Computação (INF1019)
+Professor: Markus Endler
+Monitora: Jéssica Almeida
+Alunas:
+Bianca Villar  -  1510321
+Livia Aloise   -  1510952
+
+
+Compilação:
+
+gcc -o escalonador escalonador.c fila.c
+gcc -o t1 interpretador.c
+gcc -o ex ex.c
+gcc -o ex2 ex2.c
+gcc -o ex3 ex3.c
+
+Modo de uso:
+
+Entre no terminal, e no diretório do trabalho. Execute “./t1”, digite os comandos referentes a execução do programa no formato exec <nome> (r1,r2,..,rn), onde ri são as rajadas e n é no máximo 20. Para sair digite 0.
+
+Execução:
+O programa interpretador.c lê os diferentes programas e coloca na memória compartilhada e manda um sinal (SIGUSR1) para o escalonador saber que tem algo na memória compartilhada.
+
+No escalonador.c  lê da memoria compartilhada e executa o programa durante as rajadas de tempo ditas.
+
+
+Testes:
+
+Teste com uma rajada:
+
+
+-->Interpretador, digite os programas - 0 para terminar:
+(Escalonador pausado)
+exec <ex> (5)
+BOTOU FILA 1
+FILA 1
+pid do ex: 3228
+FILA 2
+pid do ex: 3228
+pid do ex: 3228
+FILA 3
+pid do ex: 3228
+pid do ex: 3228
+(Escalonador pausado)
+Processo 3228 terminou
+
+
+2 RAJADAS
+
+-->Interpretador, digite os programas - 0 para terminar:
+(Escalonador pausado)
+exec <ex2> (2,3)
+BOTOU FILA 1
+FILA 1
+pid: 2614
+FILA 2
+pid: 2614
+(Escalonador pausado)
+FILA 1
+pid: 2614
+FILA 2
+pid: 2614
+pid: 2614
+(Escalonador pausado)
+Processo 2614 terminou
+
+
+--EXEMPLO 2--
+
+$ ./T1
+-->Interpretador, digite os programas - 0 para terminar:
+(Escalonador pausado)
+exec <ex> (10,1)
+BOTOU FILA 1
+FILA 1
+pid do ex: 3256
+FILA 2
+pid do ex: 3256
+pid do ex: 3256
+FILA 3
+pid do ex: 3256
+pid do ex: 3256
+pid do ex: 3256
+pid do ex: 3256
+pid do ex: 3256
+pid do ex: 3256
+pid do ex: 3256
+(Escalonador pausado)
+Entrou no io processo: 3256
+FILA 2
+pid do ex: 3256
+(Escalonador pausado)
+Processo 3256 terminou
+
+
+
