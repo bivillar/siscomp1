@@ -1,0 +1,37 @@
+1 RAJADA
+
+-->Interpretador, digite os programas - 0 para terminar:
+(Escalonador pausado)
+exec <ex> (5)
+BOTOU FILA 1
+FILA 1
+pid do ex: 3228
+FILA 2
+pid do ex: 3228
+pid do ex: 3228
+FILA 3
+pid do ex: 3228
+pid do ex: 3228
+(Escalonador pausado)
+Processo 3228 terminou
+
+2 RAJADAS
+
+-->Interpretador, digite os programas - 0 para terminar:
+(Escalonador pausado)
+exec <ex2> (2,3)
+BOTOU FILA 1
+FILA 1
+pid: 3351
+FILA 2
+pid: 3351
+(Escalonador pausado)
+FILA 1
+pid: 3351
+FILA 2
+pid: 3351
+pid: 3351
+(Escalonador pausado)
+Processo 3351 terminou
+
+
