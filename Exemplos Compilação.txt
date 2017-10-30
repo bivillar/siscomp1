@@ -15,3 +15,30 @@ pid: 2614
 pid: 2614
 (Escalonador pausado)
 Processo 2614 terminou
+
+
+--EXEMPLO 2--
+
+$ ./T1
+-->Interpretador, digite os programas - 0 para terminar:
+(Escalonador pausado)
+exec <ex> (10,1)
+BOTOU FILA 1
+FILA 1
+pid do ex: 3256
+FILA 2
+pid do ex: 3256
+pid do ex: 3256
+FILA 3
+pid do ex: 3256
+pid do ex: 3256
+pid do ex: 3256
+pid do ex: 3256
+pid do ex: 3256
+pid do ex: 3256
+pid do ex: 3256
+(Escalonador pausado)
+FILA 2
+pid do ex: 3256
+(Escalonador pausado)
+Processo 3256 terminou
