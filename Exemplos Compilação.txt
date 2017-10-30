@@ -1,0 +1,17 @@
+$ ./T1
+-->Interpretador, digite os programas - 0 para terminar:
+(Escalonador pausado)
+exec <ex2> (2,3)
+BOTOU FILA 1
+FILA 1
+pid: 2614
+FILA 2
+pid: 2614
+(Escalonador pausado)
+FILA 1
+pid: 2614
+FILA 2
+pid: 2614
+pid: 2614
+(Escalonador pausado)
+Processo 2614 terminou
